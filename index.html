@@ -42,8 +42,6 @@
     text-transform: uppercase;
   }
 
-  /* ---------- circuit trace signature ---------- */
-
   .trace {
     position: absolute;
     left: 50%;
@@ -79,18 +77,12 @@
     .trace::after { animation: none; opacity: 0.6; top: 50%; }
   }
 
-  /* ---------- header ---------- */
-
   header {
     position: relative;
     text-align: center;
     padding: 90px 20px 70px;
     overflow: hidden;
-    background-image:
-      linear-gradient(180deg, rgba(10, 14, 26, 0.55) 0%, rgba(10, 14, 26, 0.85) 65%, var(--bg) 100%),
-      url("banner.jpg");
-    background-size: cover;
-    background-position: center;
+    background-color: var(--bg);
   }
 
   .status-pill {
@@ -112,6 +104,30 @@
     background: var(--cyan);
     box-shadow: 0 0 8px 2px var(--cyan);
     animation: blink 2s ease-in-out infinite;
+  }
+
+  .music-toggle {
+    display: block;
+    margin: 0 auto 28px;
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, color 0.2s;
+  }
+
+  .music-toggle:hover,
+  .music-toggle:focus-visible {
+    border-color: var(--cyan);
+    box-shadow: 0 0 12px rgba(53, 240, 196, 0.25);
+    outline: none;
+  }
+
+  .music-toggle.playing {
+    color: var(--amber);
   }
 
   @keyframes blink {
@@ -169,8 +185,6 @@
     outline: none;
   }
 
-  /* ---------- sections ---------- */
-
   section {
     position: relative;
     max-width: 760px;
@@ -201,8 +215,6 @@
     color: var(--text);
   }
 
-  /* ---------- project grid ---------- */
-
   .project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -217,6 +229,7 @@
     border-radius: 10px;
     padding: 24px 20px;
     transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
   }
 
   .project-card::before {
@@ -250,7 +263,87 @@
     font-size: 0.92rem;
   }
 
-  /* ---------- contact ---------- */
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+
+  .tech-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--amber);
+    background: rgba(255, 176, 32, 0.08);
+    border: 1px solid rgba(255, 176, 32, 0.3);
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+
+  .project-expand {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, margin-top 0.4s ease;
+  }
+
+  .project-card.open .project-expand {
+    max-height: 600px;
+    margin-top: 14px;
+  }
+
+  .project-expand p {
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .expand-hint {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--cyan);
+  }
+
+  .project-card.open .expand-hint {
+    display: none;
+  }
+
+  .skills-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  .skill-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+
+  .skill-chip:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 12px rgba(53, 240, 196, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .skill-chip::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px 1px var(--cyan);
+    flex-shrink: 0;
+  }
 
   #contact {
     text-align: center;
@@ -295,8 +388,6 @@
     fill: currentColor;
   }
 
-  /* ---------- gallery carousel ---------- */
-
   .carousel {
     position: relative;
     margin-top: 28px;
@@ -319,7 +410,8 @@
   .carousel-slide img {
     width: 100%;
     height: 320px;
-    object-fit: cover;
+    object-fit: contain;
+    background: #000;
     display: block;
   }
 
@@ -405,13 +497,16 @@
 
 <header>
   <div class="status-pill"><span class="status-dot"></span><span class="label">system online</span></div>
-  <img src="profile.JPEG.jpeg" alt="Moviru Basnayake" class="profile-pic">
+  <button id="musicToggle" class="music-toggle label" aria-pressed="false">▶ play music</button>
+  <audio id="bgMusic" src="music.mp3.3gp" loop preload="none"></audio>
+  <img src="profile.jpeg.jpeg" alt="Moviru Basnayake" class="profile-pic">
   <h1>Moviru Basnayake</h1>
   <p class="tagline">&gt; robotics student // building circuits, code &amp; cool stuff</p>
   <nav>
     <a href="#about">About</a>
     <a href="#gallery">Gallery</a>
     <a href="#projects">Projects</a>
+    <a href="#skills">Skills</a>
     <a href="#contact">Contact</a>
   </nav>
 </header>
@@ -431,16 +526,24 @@
     <div class="carousel" id="carousel">
       <div class="carousel-track" id="carouselTrack">
         <div class="carousel-slide">
-          <img src="gallery-1.JPEG.jpeg" alt="EDEXSTEM BATCH02">
+          <img src="gallery-1.jpeg.jpeg" alt="EDEXSTEM BATCH02">
           <div class="carousel-caption">EDEXSTEM BATCH02</div>
         </div>
         <div class="carousel-slide">
-          <img src="gallery-2.JPEG.jpeg" alt="MOVIRU BASNAYAKE">
+          <img src="gallery-2.jpeg.jpeg" alt="MOVIRU BASNAYAKE">
           <div class="carousel-caption">MOVIRU BASNAYAKE</div>
         </div>
         <div class="carousel-slide">
-          <img src="gallery-3.JPEG.jpeg" alt="Missile launcher project">
+          <img src="gallery-3.jpeg.jpeg" alt="Missile launcher project">
           <div class="carousel-caption">Missile Launcher</div>
+        </div>
+        <div class="carousel-slide">
+          <img src="gallery-4.jpeg.jpeg" alt="Missile launcher project">
+          <div class="carousel-caption">level up</div>
+        </div>
+        <div class="carousel-slide">
+          <img src="gallery-5.jpeg.jpeg" alt="Missile launcher project">
+          <div class="carousel-caption">presentation</div>
         </div>
       </div>
       <button class="carousel-btn carousel-prev" id="carouselPrev" aria-label="Previous photo">‹</button>
@@ -456,30 +559,92 @@
       <div class="project-card" data-tag="build_01">
         <h3>RADAR System</h3>
         <p>A working radar setup for detecting nearby objects.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Arduino</span>
+          <span class="tech-tag">Ultrasonic Sensor</span>
+          <span class="tech-tag">LED'S</span>
+          <span class="tech-tag">Buzzer</span>
+          <span class="tech-tag">Servo motor</span>
+        </div>
+        <span class="expand-hint">+ click for details</span>
+        <div class="project-expand">
+          <p>The servo rotates 180 degrees with the ultrasonic sensor. When an object is detected within range, the buzzer sounds and a red LED is lighted. If not, a green LED is lighted.</p>
+        </div>
       </div>
       <div class="project-card" data-tag="build_02">
         <h3>Bus Seat Indicator</h3>
         <p>A system that shows which bus seats are free or taken.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Arduino</span>
+          <span class="tech-tag">Push buttons</span>
+          <span class="tech-tag">LEDs</span>
+          <span class="tech-tag">7 segment display</span>
+          <span class="tech-tag">a toy bus (for the prototype)</span>
+        </div>
+        <span class="expand-hint">+ click for details</span>
+        <div class="project-expand">
+          <p>In the prototype I included only 4 seats. When a button is pressed, a green LED is lighted and 3 is displayed, likewise for every button. When all the buttons are pressed, a red LED is lighted and 0 is displayed.</p>
+        </div>
       </div>
       <div class="project-card" data-tag="build_03">
         <h3>Missile Launcher</h3>
         <p>A mechanical launcher project exploring motion and control.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Arduino</span>
+          <span class="tech-tag">Motor drive</span>
+          <span class="tech-tag">Bluetooth module</span>
+          <span class="tech-tag">App (developed using MIT App Inventor)</span>
+          <span class="tech-tag">2 servo motors</span>
+          <span class="tech-tag">High voltage generator</span>
+          <span class="tech-tag">Syringe</span>
+        </div>
+        <span class="expand-hint">+ click for details</span>
+        <div class="project-expand">
+          <p>The missile is the syringe — we seal all the holes in it, then spray some sanitizer or perfume inside. A spark is created by the high voltage generator, causing a chemical reaction inside the syringe that produces air, which blasts the syringe into the atmosphere. The 2 servos align the target on the X and Y axis. The launcher itself is like a tank that can move forward, backward, left, and right. All functions are controlled by the app.</p>
+        </div>
       </div>
     </div>
   </section>
 
+  <section id="skills">
+    <p class="section-eyebrow label">// 04 skills</p>
+    <h2>Skills &amp; Tools</h2>
+    <div class="skills-row">
+      <span class="skill-chip">Arduino</span>
+      <span class="skill-chip">C++</span>
+      <span class="skill-chip">Circuit Design</span>
+      <span class="skill-chip">Soldering</span>
+      <span class="skill-chip">Breadboarding</span>
+      <span class="skill-chip">Python</span>
+      <span class="skill-chip">HTML/CSS</span>
+        <span class="skill-chip">Simple app development</span>
+      <span class="skill-chip">Sensors (Ultrasonic, IR, ..........)</span>
+      <span class="skill-chip">Robotics Competitions</span>
+      <span class="skill-chip">Problem Solving</span>
+      <span class="skill-chip">Team Collaboration</span>
+      <span class="skill-chip">Video Editing</span>
+      <span class="skill-chip">Content Creation</span>
+      <span class="skill-chip">AI</span>
+    </div>
+  </section>
+
   <section id="contact">
-    <p class="section-eyebrow label">// 04 contact</p>
+    <p class="section-eyebrow label">// 05 contact</p>
     <h2>You Can Contact Me</h2>
     <div class="contact-row">
       <a class="contact-card" href="https://mail.google.com/mail/?view=cm&fs=1&to=movirub@gmail.com" target="_blank" rel="noopener noreferrer">✉ movirub@gmail.com</a>
       <a class="contact-card" href="https://www.tiktok.com/@moyya293" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16.6 5.82c-1.02-.9-1.66-2.16-1.7-3.62h-3.14v14.34c0 1.6-1.3 2.9-2.9 2.9a2.9 2.9 0 0 1 0-5.8c.28 0 .55.04.8.11V10.6a6.06 6.06 0 0 0-.8-.05A6.05 6.05 0 0 0 2.8 16.6a6.05 6.05 0 0 0 6.06 6.05 6.05 6.05 0 0 0 6.05-6.05V9.4a9.16 9.16 0 0 0 5.34 1.7V8a5.86 5.86 0 0 1-3.65-2.18z"/></svg>
         @moyya293
-        <a class="contact-card" href="https://www.instagram.com/moviru_anusara" target="_blank" rel="noopener noreferrer">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.16c-3.67 0-6.66 2.99-6.66 6.66 0 3.67 2.99 6.66 6.66 6.66s6.66-2.99 6.66-6.66c0-3.67-2.99-6.66-6.66-6.66zm0 11c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5zm0-7c-.83 0-1 .83-.83 1s1 .83 .83-.83-.83-.83-.83-.83z"/></svg>
-          @moviru_anusara
-        </a>
+      </a>
+      <a class="contact-card" href="https://www.instagram.com/moviru_anusara" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.16c-3.67 0-6.66 2.99-6.66 6.66 0 3.67 2.99 6.66 6.66 6.66s6.66-2.99 6.66-6.66c0-3.67-2.99-6.66-6.66-6.66zm0 11c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5zm0-7c-.83 0-1 .83-.83 1s1 .83 .83-.83-.83-.83-.83-.83z"/></svg>
+        @moviru_anusara
+      </a>
+    
+      <a class="contact-card" href="https://github.com/Moviru-basnayake" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.6-4.04-1.6-.55-1.4-1.34-1.76-1.34-1.76-1.1-.75.08-.74.08-.74 1.2.09 1.84 1.24 1.84 1.24 1.08 1.84 2.83 1.31 3.52 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.49 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .3z"/></svg>
+        Moviru-basnayake
       </a>
     </div>
   </section>
@@ -538,6 +703,34 @@
     carousel.addEventListener('focusout', startAutoplay);
 
     startAutoplay();
+  })();
+
+  (function () {
+    const btn = document.getElementById('musicToggle');
+    const audio = document.getElementById('bgMusic');
+
+    btn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        btn.textContent = '⏸ pause music';
+        btn.classList.add('playing');
+        btn.setAttribute('aria-pressed', 'true');
+      } else {
+        audio.pause();
+        btn.textContent = '▶ play music';
+        btn.classList.remove('playing');
+        btn.setAttribute('aria-pressed', 'false');
+      }
+    });
+  })();
+
+  (function () {
+    const cards = document.querySelectorAll('.project-card');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.toggle('open');
+      });
+    });
   })();
 </script>
 
