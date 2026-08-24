@@ -4,12 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moviru Basnayake — Robotics Portfolio</title>
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<meta name="description" content="Moviru Basnayake — 13-year-old robotics student building RADAR systems, seat indicators, and launchers.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Moviru Basnayake — Robotics Portfolio">
+<meta property="og:description" content="Robotics student building RADAR systems, seat indicators, and launchers.">
+<meta property="og:image" content="https://moviru-basnayake.github.io/og-image.png">
+<meta property="og:url" content="https://moviru-basnayake.github.io">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Moviru Basnayake — Robotics Portfolio">
+<meta name="twitter:description" content="Robotics student building RADAR systems, seat indicators, and launchers.">
+<meta name="twitter:image" content="https://moviru-basnayake.github.io/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-
-  :root {
+:root {
     --bg: #0a0e1a;
     --bg-grid: #0d1420;
     --surface: #121a2b;
@@ -21,6 +35,146 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  #scrollProgress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: #35f0c4;
+    box-shadow: 0 0 8px #35f0c4;
+    z-index: 10000;
+    transition: width 0.1s ease-out;
+  }
+
+  #backToTop {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(53, 240, 196, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, box-shadow 0.2s ease;
+    z-index: 500;
+  }
+
+  #backToTop.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  #backToTop:hover,
+  #backToTop:focus-visible {
+    box-shadow: 0 0 20px rgba(53, 240, 196, 0.6);
+    outline: none;
+  }
+
+  #backToTop svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media (max-width: 600px) {
+    #backToTop {
+      bottom: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+    }
+  }
+
+
+  #bootScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #0a0e1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+
+  #bootScreen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .boot-ring {
+    margin-bottom: 26px;
+  }
+
+  #bootRingProgress {
+    filter: drop-shadow(0 0 6px #35f0c4);
+    transform: rotate(-90deg);
+    transform-origin: 45px 45px;
+    transition: stroke-dashoffset 0.15s linear;
+  }
+
+  .boot-status {
+    color: #35f0c4;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+  }
+
+  .boot-sub {
+    color: #8b96ac;
+    font-size: 0.7rem;
+    margin-bottom: 20px;
+  }
+
+  .boot-dots {
+    animation: bootDots 1.4s infinite;
+  }
+
+  @keyframes bootDots {
+    0%, 20% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+  }
+
+  .boot-bar-track {
+    width: 220px;
+    height: 4px;
+    background: #22304a;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .boot-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: #35f0c4;
+    box-shadow: 0 0 8px #35f0c4;
+    transition: width 0.15s linear;
+  }
+
+  .boot-percent {
+    color: #ffb020;
+    font-size: 0.65rem;
+    margin-top: 10px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #bootScreen { display: none; }
+  }
+
 
   html { scroll-behavior: smooth; }
 
@@ -83,6 +237,23 @@
     padding: 90px 20px 70px;
     overflow: hidden;
     background-color: var(--bg);
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #circuitCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 1;
   }
 
   .status-pill {
@@ -106,9 +277,18 @@
     animation: blink 2s ease-in-out infinite;
   }
 
-  .music-toggle {
-    display: block;
+  .music-player {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     margin: 0 auto 28px;
+    flex-wrap: wrap;
+  }
+
+  .music-toggle {
+    display: inline-block;
+    margin: 0;
     background: transparent;
     color: var(--cyan);
     border: 1px solid var(--line);
@@ -128,6 +308,34 @@
 
   .music-toggle.playing {
     color: var(--amber);
+  }
+
+  .music-nav-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .music-nav-btn:hover,
+  .music-nav-btn:focus-visible {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    outline: none;
+  }
+
+  .track-name {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-left: 4px;
   }
 
   @keyframes blink {
@@ -345,12 +553,138 @@
     flex-shrink: 0;
   }
 
+  .timeline {
+    position: relative;
+    margin-top: 28px;
+    padding-left: 28px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: var(--line);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 32px;
+  }
+
+  .timeline-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -28px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px 2px rgba(53, 240, 196, 0.5);
+  }
+
+  .timeline-dot.active {
+    background: var(--amber);
+    box-shadow: 0 0 10px 3px rgba(255, 176, 32, 0.6);
+  }
+
+  .timeline-year {
+    font-size: 0.7rem;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+
+  .timeline-item h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .timeline-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
   #contact {
     text-align: center;
     padding-bottom: 110px;
   }
 
   #contact h2 { text-align: left; }
+
+  .contact-form {
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px;
+    margin-top: 24px;
+    max-width: 500px;
+  }
+
+  .form-row {
+    margin-bottom: 18px;
+  }
+
+  .form-row label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--cyan);
+    margin-bottom: 8px;
+  }
+
+  .form-row input,
+  .form-row textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.9rem;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .form-row input:focus,
+  .form-row textarea:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 12px rgba(53, 240, 196, 0.2);
+  }
+
+  .form-submit {
+    background: transparent;
+    color: var(--bg);
+    background-color: var(--cyan);
+    border: none;
+    border-radius: 6px;
+    padding: 12px 26px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .form-submit:hover {
+    box-shadow: 0 0 16px rgba(53, 240, 196, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .form-status {
+    margin-top: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--amber);
+  }
 
   .contact-row {
     display: flex;
@@ -495,10 +829,34 @@
 </head>
 <body>
 
+<div id="scrollProgress"></div>
+
+<div id="bootScreen">
+  <svg width="90" height="90" viewBox="0 0 90 90" class="boot-ring">
+    <circle cx="45" cy="45" r="36" fill="none" stroke="#22304a" stroke-width="3"/>
+    <circle id="bootRingProgress" cx="45" cy="45" r="36" fill="none" stroke="#35f0c4" stroke-width="3" stroke-linecap="round"
+      stroke-dasharray="226" stroke-dashoffset="226"/>
+  </svg>
+  <p class="boot-status label">initializing system</p>
+  <p class="boot-sub">loading portfolio<span class="boot-dots">...</span></p>
+  <div class="boot-bar-track">
+    <div id="bootBarFill" class="boot-bar-fill"></div>
+  </div>
+  <p id="bootPercent" class="boot-percent">0%</p>
+</div>
+
+
 <header>
+  <canvas id="circuitCanvas"></canvas>
+  <div class="header-content">
   <div class="status-pill"><span class="status-dot"></span><span class="label">system online</span></div>
-  <button id="musicToggle" class="music-toggle label" aria-pressed="false">▶ play music</button>
-  <audio id="bgMusic" src="music.mp3.3gp" loop preload="none"></audio>
+  <div class="music-player">
+    <button id="prevTrack" class="music-nav-btn" aria-label="Previous song">⏮</button>
+    <button id="musicToggle" class="music-toggle label" aria-pressed="false">▶ play</button>
+    <button id="nextTrack" class="music-nav-btn" aria-label="Next song">⏭</button>
+    <span id="trackName" class="track-name label">track_01</span>
+  </div>
+  <audio id="bgMusic" preload="none"></audio>
   <img src="profile.jpeg.jpeg" alt="Moviru Basnayake" class="profile-pic">
   <h1>Moviru Basnayake</h1>
   <p class="tagline">&gt; robotics student // building circuits, code &amp; cool stuff</p>
@@ -507,8 +865,10 @@
     <a href="#gallery">Gallery</a>
     <a href="#projects">Projects</a>
     <a href="#skills">Skills</a>
+    <a href="#achievements">Achievements</a>
     <a href="#contact">Contact</a>
   </nav>
+  </div>
 </header>
 
 <div style="position: relative;">
@@ -617,7 +977,6 @@
       <span class="skill-chip">Breadboarding</span>
       <span class="skill-chip">Python</span>
       <span class="skill-chip">HTML/CSS</span>
-        <span class="skill-chip">Simple app development</span>
       <span class="skill-chip">Sensors (Ultrasonic, IR, ..........)</span>
       <span class="skill-chip">Robotics Competitions</span>
       <span class="skill-chip">Problem Solving</span>
@@ -628,9 +987,52 @@
     </div>
   </section>
 
+  <section id="achievements">
+    <p class="section-eyebrow label">// 05 achievements</p>
+    <h2>Milestones</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <p class="timeline-year label">2024</p>
+        <h3>RADAR System</h3>
+        <p class="timeline-desc">Built and coded a working radar system using an ultrasonic sensor and servo motor.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <p class="timeline-year label">2025</p>
+        <h3>Bus Seat Simulator &amp; RC Car</h3>
+        <p class="timeline-desc">Built a bus seat availability indicator prototype and an RC car project.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot active"></div>
+        <p class="timeline-year label">2026</p>
+        <h3>Missile Launcher</h3>
+        <p class="timeline-desc">Combined Bluetooth control, servos, and a custom app to build the most advanced project yet.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="contact">
-    <p class="section-eyebrow label">// 05 contact</p>
+    <p class="section-eyebrow label">// 06 contact</p>
     <h2>You Can Contact Me</h2>
+
+    <form class="contact-form" action="https://formspree.io/f/mdenjpok" method="POST">
+      <div class="form-row">
+        <label for="name" class="label">Name</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-row">
+        <label for="email" class="label">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-row">
+        <label for="message" class="label">Message</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="form-submit label">Send Message</button>
+      <p id="formStatus" class="form-status"></p>
+    </form>
+
     <div class="contact-row">
       <a class="contact-card" href="https://mail.google.com/mail/?view=cm&fs=1&to=movirub@gmail.com" target="_blank" rel="noopener noreferrer">✉ movirub@gmail.com</a>
       <a class="contact-card" href="https://www.tiktok.com/@moyya293" target="_blank" rel="noopener noreferrer">
@@ -641,9 +1043,8 @@
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.16c-3.67 0-6.66 2.99-6.66 6.66 0 3.67 2.99 6.66 6.66 6.66s6.66-2.99 6.66-6.66c0-3.67-2.99-6.66-6.66-6.66zm0 11c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5zm0-7c-.83 0-1 .83-.83 1s1 .83 .83-.83-.83-.83-.83-.83z"/></svg>
         @moviru_anusara
       </a>
-    
       <a class="contact-card" href="https://github.com/Moviru-basnayake" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.6-4.04-1.6-.55-1.4-1.34-1.76-1.34-1.76-1.1-.75.08-.74.08-.74 1.2.09 1.84 1.24 1.84 1.24 1.08 1.84 2.83 1.31 3.52 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.49 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .3z"/></svg>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.58 2 12.19c0 4.49 2.87 8.3 6.84 9.64.5.1.68-.22.68-.49 0-.24-.01-1.03-.01-1.87-2.78.61-3.37-1.21-3.37-1.21-.45-1.18-1.11-1.5-1.11-1.5-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.55 2.34 1.1 2.91.84.09-.66.35-1.1.63-1.36-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.02 10.02 0 0 0 22 12.19C22 6.58 17.52 2 12 2z"/></svg>
         Moviru-basnayake
       </a>
     </div>
@@ -652,8 +1053,85 @@
 
 <footer>built by moviru basnayake</footer>
 
+<button id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="19" x2="12" y2="5"/>
+    <polyline points="5 12 12 5 19 12"/>
+  </svg>
+</button>
+
 <script>
-  (function () {
+(function () {
+  const btn = document.getElementById('backToTop');
+  if (!btn) return;
+
+  function toggleVisibility() {
+    if (window.scrollY > 400) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  toggleVisibility();
+})();
+
+(function () {
+  const bar = document.getElementById('scrollProgress');
+  if (!bar) return;
+
+  function updateProgress() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = percent + '%';
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+})();
+
+(function () {
+  const bootScreen = document.getElementById('bootScreen');
+  const ring = document.getElementById('bootRingProgress');
+  const barFill = document.getElementById('bootBarFill');
+  const percentText = document.getElementById('bootPercent');
+  const circumference = 226;
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion || !bootScreen) return;
+
+  let progress = 0;
+  const duration = 1600;
+  const startTime = performance.now();
+
+  function tick(now) {
+    const elapsed = now - startTime;
+    progress = Math.min(elapsed / duration, 1);
+    const percent = Math.floor(progress * 100);
+
+    ring.style.strokeDashoffset = circumference - (circumference * progress);
+    barFill.style.width = percent + '%';
+    percentText.textContent = percent + '%';
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      setTimeout(() => {
+        bootScreen.classList.add('hidden');
+      }, 200);
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+
+(function () {
     const track = document.getElementById('carouselTrack');
     const slides = track.children;
     const dotsWrap = document.getElementById('carouselDots');
@@ -706,21 +1184,71 @@
   })();
 
   (function () {
+    const playlist = [
+      { title: 'track_01', src: 'music1.mp3' },
+      { title: 'track_02', src: 'music2.mp3' },
+      { title: 'track_03', src: 'music3.mp3' },
+      { title: 'track_04', src: 'music4.mp3' }
+    ];
+
     const btn = document.getElementById('musicToggle');
+    const prevBtn = document.getElementById('prevTrack');
+    const nextBtn = document.getElementById('nextTrack');
+    const trackName = document.getElementById('trackName');
     const audio = document.getElementById('bgMusic');
+
+    let current = 0;
+    let wasPlaying = false;
+
+    function loadTrack(i, autoplay) {
+      current = (i + playlist.length) % playlist.length;
+      audio.src = playlist[current].src;
+      trackName.textContent = playlist[current].title;
+      if (autoplay) {
+        audio.play();
+      }
+    }
+
+    loadTrack(0, false);
 
     btn.addEventListener('click', () => {
       if (audio.paused) {
         audio.play();
-        btn.textContent = '⏸ pause music';
+        btn.textContent = '⏸ pause';
         btn.classList.add('playing');
         btn.setAttribute('aria-pressed', 'true');
       } else {
         audio.pause();
-        btn.textContent = '▶ play music';
+        btn.textContent = '▶ play';
         btn.classList.remove('playing');
         btn.setAttribute('aria-pressed', 'false');
       }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      wasPlaying = !audio.paused;
+      loadTrack(current - 1, wasPlaying);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      wasPlaying = !audio.paused;
+      loadTrack(current + 1, wasPlaying);
+    });
+
+    audio.addEventListener('ended', () => {
+      loadTrack(current + 1, true);
+    });
+
+    audio.addEventListener('play', () => {
+      btn.textContent = '⏸ pause';
+      btn.classList.add('playing');
+      btn.setAttribute('aria-pressed', 'true');
+    });
+
+    audio.addEventListener('pause', () => {
+      btn.textContent = '▶ play';
+      btn.classList.remove('playing');
+      btn.setAttribute('aria-pressed', 'false');
     });
   })();
 
@@ -730,6 +1258,176 @@
       card.addEventListener('click', () => {
         card.classList.toggle('open');
       });
+    });
+  })();
+
+  (function () {
+    const canvas = document.getElementById('circuitCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const header = canvas.parentElement;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function resize() {
+      const rect = header.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let mouse = { x: -999, y: -999 };
+    header.addEventListener('mousemove', (e) => {
+      const rect = header.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+    header.addEventListener('mouseleave', () => {
+      mouse.x = -999;
+      mouse.y = -999;
+    });
+
+    const NODE_COUNT = 80;
+    let nodes = [];
+    function initNodes() {
+      nodes = [];
+      for (let i = 0; i < NODE_COUNT; i++) {
+        nodes.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25
+        });
+      }
+    }
+    initNodes();
+    window.addEventListener('resize', initNodes);
+
+    const cyan = '53,240,196';
+    const amber = '255,176,32';
+    const linkDist = 110;
+    const mouseDist = 130;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const n of nodes) {
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+
+        const dx = n.x - mouse.x;
+        const dy = n.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < mouseDist) {
+          n.x += (dx / dist) * 0.6;
+          n.y += (dy / dist) * 0.6;
+        }
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < linkDist) {
+            ctx.strokeStyle = 'rgba(' + cyan + ',' + (1 - dist / linkDist) * 0.3 + ')';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      for (const n of nodes) {
+        const dx = n.x - mouse.x;
+        const dy = n.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const near = dist < mouseDist;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, near ? 2.5 : 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = near ? 'rgb(' + amber + ')' : 'rgb(' + cyan + ')';
+        ctx.shadowColor = near ? 'rgb(' + amber + ')' : 'rgb(' + cyan + ')';
+        ctx.shadowBlur = near ? 8 : 4;
+        ctx.fill();
+      }
+    }
+
+    function drawStatic() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < linkDist) {
+            ctx.strokeStyle = 'rgba(' + cyan + ',' + (1 - dist / linkDist) * 0.3 + ')';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      for (const n of nodes) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgb(' + cyan + ')';
+        ctx.shadowColor = 'rgb(' + cyan + ')';
+        ctx.shadowBlur = 4;
+        ctx.fill();
+      }
+    }
+
+    if (prefersReducedMotion) {
+      drawStatic();
+    } else {
+      function loop() {
+        draw();
+        requestAnimationFrame(loop);
+      }
+      loop();
+    }
+  })();
+
+  (function () {
+    const form = document.querySelector('.contact-form');
+    if (!form) return;
+    const status = document.getElementById('formStatus');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = 'sending...';
+      status.style.color = 'var(--cyan)';
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          status.textContent = '✓ message sent — thanks!';
+          status.style.color = 'var(--cyan)';
+          form.reset();
+        } else {
+          status.textContent = 'something went wrong, try again';
+          status.style.color = 'var(--amber)';
+        }
+      } catch (err) {
+        status.textContent = 'something went wrong, try again';
+        status.style.color = 'var(--amber)';
+      }
     });
   })();
 </script>
